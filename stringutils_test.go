@@ -1,7 +1,7 @@
 package stringutils
 
 import "testing"
-
+import "strings"
 
 func TestCountChars(t *testing.T) {
 	var flagtests = []struct {
@@ -32,19 +32,69 @@ func TestSplitIntoWords(t *testing.T) {
 	}{
 		{"one", words{"one"}},
 		{"uno dís",words{"uno", "dís"}},
-		{"    ",words{}},
+		{"    ",words{""}},
 		{"  unó    ",words{"unó"}},
-		{"uno   dós ",words{"uno","dós"}},
+		{"úno ",words{"úno"}},
+		{"úno   dós ",words{"úno","dós"}},
+		{"uno\ndós ",words{"uno","dós"}},
+		{"uno\tdós\n",words{"uno","dós"}},
 	}
 
 	for _, te := range flagtests {
 		re := SplitIntoWords(te.st)
 		for i, st := range re {
 			if st != te.re[i] {
-				t.Errorf("Not equals. Expected:%v, Actual:%v", te.re, re)
+				t.Errorf("Not equals. Param:%q  Expected:%v, Actual:%v",te.st, te.re, re)
 				break
 			}
 
 		}
 	}
 }
+
+func TestSplitIntoWordsFast(t *testing.T) {
+	type words []string
+	var flagtests = []struct {
+		st string
+		re words
+	}{
+		{"one", words{"one"}},
+		{"uno dís",words{"uno", "dís"}},
+		{"    ",words{""}},
+		{"  unó    ",words{"unó"}},
+		{"úno ",words{"úno"}},
+		{"uno   dós ",words{"uno","dós"}},
+		{"uno\ndós ",words{"uno","dós"}},
+		{"uno\tdós\n",words{"uno","dós"}},
+	}
+
+	for _, te := range flagtests {
+		re := SplitIntoWordsFast(te.st)
+		for i, st := range re {
+			if st != te.re[i] {
+				t.Errorf("Not equals. Param:%q  Expected:%v, Actual:%v",te.st, te.re, re)
+				break
+			}
+
+		}
+	}
+}
+
+func BenchmarkSplitIntoWords(b *testing.B) {
+	for i:=0; i < b.N; i++ {
+		SplitIntoWords("uno dós \ntres\tcuatro")
+	}
+}
+func BenchmarkSplitIntoWordsFast(b *testing.B) {
+	for i:=0; i < b.N; i++ {
+		SplitIntoWordsFast("uno dós \ntres\tcuatro")
+	}
+}
+
+func BenchmarkSplit(b *testing.B) {
+	for i:=0; i < b.N; i++ {
+		strings.Fields("uno dós \ntres\tcuatro")
+	}
+}
+
+
