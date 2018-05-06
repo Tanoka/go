@@ -58,3 +58,24 @@ func SplitIntoWordsFast(s string) (res []string) {
 	}
 	return
 }
+
+func Trim(s string) string {
+	//Trabajamos con runas directamente... para poder hacer trim del final del string, con strings tenemos que recorrerlo entero.
+	rs := []rune(s)
+	var ini int
+	for i, c := range s {
+		if !isSpace(c) {
+			ini = i
+			break
+		}
+	}
+
+	end := len(rs)
+	for x := end - 1; x > 0; x-- {
+		if !isSpace(rs[x]) {
+			end = x + 1
+			break
+		}
+	}
+	return string(rs[ini:end])
+}
